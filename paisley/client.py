@@ -467,13 +467,15 @@ class CouchDB(object):
         for name, data in views.iteritems():
             document["views"][name] = data
 
-    def tempView(self, dbName, view):
+    def tempView(self, dbName, view, **kw):
         """
         Make a temporary view on the server.
+        This one accepts query string parameters.
         """
+        encoded_args = '' if not kw else '?%s' % urllib.urlencode(kw)
         if not isinstance(view, (str, unicode)):
             view = json.dumps(view)
-        d = self.post("/%s/_temp_view" % (dbName, ), view, descr='tempView')
+            d = self.post("/%s/_temp_view%s" % (dbName, encoded_args, ), view, descr='tempView')
         return d.addCallback(self.parseResult)
 
     # Basic http methods
